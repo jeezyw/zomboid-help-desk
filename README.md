@@ -50,6 +50,8 @@ directory:
 ```bash
 docker compose up -d --build
 ```
+If that doesn't build correctly, just run the builder.sh script to clear cache and
+build the docker control agent before the webui.
 
 Then open:
 
