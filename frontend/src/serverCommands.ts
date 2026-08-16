@@ -53,7 +53,7 @@ export const SERVER_COMMANDS: ServerCommandDef[] = [
   // --- Items ---
   {
     id: "additem", command: "additem", label: "Give Item", group: "Items",
-    description: 'Give an item to a player. Use: /additem "username" module.item count',
+    description: 'Give an item to a player',
     fields: [
       { key: "username", label: "Player", type: "player" },
       { key: "item", label: "Item", type: "item" },
@@ -63,7 +63,7 @@ export const SERVER_COMMANDS: ServerCommandDef[] = [
   },
   {
     id: "removeitem", command: "removeitem", label: "Remove Item (from self)", group: "Items",
-    description: "Removes items from the admin's own inventory (the RCON connection, not a chosen player). 0 removes all of that type.",
+    description: "Removes items from inventory. 0 removes all of that type.",
     fields: [
       { key: "item", label: "Item", type: "item" },
       { key: "count", label: "Count (0 = all)", type: "number-optional", placeholder: "1" },
@@ -72,7 +72,7 @@ export const SERVER_COMMANDS: ServerCommandDef[] = [
   },
   {
     id: "addkey", command: "addkey", label: "Give Key", group: "Items",
-    description: 'Give a key to a player. Use: /addkey "username" "keyId" "name"',
+    description: 'Give a key to a player',
     fields: [
       { key: "username", label: "Player", type: "player" },
       { key: "keyId", label: "Key ID", type: "text" },
@@ -82,7 +82,7 @@ export const SERVER_COMMANDS: ServerCommandDef[] = [
   },
   {
     id: "addvehicle", command: "addvehicle", label: "Spawn Vehicle", group: "Items",
-    description: 'Spawn a vehicle. Use: /addvehicle "script" "user or x,y,z"',
+    description: 'Spawn a vehicle',
     fields: [
       { key: "script", label: "Vehicle Script (e.g. Base.VanAmbulance)", type: "text" },
       { key: "target", label: "Target (username or x,y,z)", type: "text" },
@@ -93,7 +93,7 @@ export const SERVER_COMMANDS: ServerCommandDef[] = [
   // --- Player Actions ---
   {
     id: "teleport", command: "teleport", label: "Teleport to Player", group: "Player Actions",
-    description: 'Teleport a player to another (or bring one player to a target). Use: /teleport "player1" "player2"',
+    description: 'Teleport a player to another (or bring one player to a target)',
     fields: [
       { key: "player1", label: "Player", type: "player" },
       { key: "player2", label: "Teleport To (optional)", type: "player-optional" },
