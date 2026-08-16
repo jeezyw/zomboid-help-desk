@@ -75,7 +75,7 @@ can still control the named container.
 
 ## Configuration
 
-Everything lives in `docker-compose.yml` - there is no `.env` file. Edit the
+Everything lives in `docker-compose.yml`
 `zomboid-webui` service directly:
 
 ```yaml
@@ -158,7 +158,7 @@ own plain file at `./webui-data/todos.json`.
 - **Secure mode is off by default.** See the warning above - turn on `SECURE_MODE`
   + put this behind HTTPS before exposing it beyond your LAN. It's a single shared
   login (no per-user accounts), which matches the rest of this app's single-admin
-  model.
+  model. Though, you can obviously share with your clanmates if you wish.
 - **RCON reachability isn't guaranteed out of the box.** The WebUI defaults to
   reaching RCON via the game container's name (works only if it ends up sharing a
   Docker network with the WebUI) - set an explicit host/IP override on the Players
