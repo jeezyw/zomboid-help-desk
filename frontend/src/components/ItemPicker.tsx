@@ -26,7 +26,8 @@ const CATEGORY_ICONS: Record<string, any> = {
   "Miscellaneous": Box,
 };
 
-/** Graphical item browser for the Give Item tool - a curated catalog (see
+/** Graphical item browser for item-type command fields (e.g. Give Item, Remove
+ * Item) in the Command Builder - a curated catalog (see
  * itemCatalog.ts), not real game icons (see that file's header for why), sorted
  * and filterable by category, with the raw item ID shown on hover and a "Custom
  * ID" fallback for anything not in the curated list. */

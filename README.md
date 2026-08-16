@@ -141,8 +141,11 @@ own plain file at `./webui-data/todos.json`.
   in the .ini and reachable; falls back to best-effort log-scraping otherwise (see
   disclaimer on the Players page, gone once RCON is connected)
 - RCON Admin Tools (Players page): kick / ban (+IP, reason) / unban / teleport /
-  give-item / server-wide announcements, plus a brief in-game warning sent
+  godmode / server-wide announcements, plus a brief in-game warning sent
   automatically before manual or scheduled restarts
+- RCON Tools tab: World Tools (common one-click commands, a Command Builder
+  covering the full RCON command set including give-item, and a raw custom
+  command box) and Adjust Skills (grant XP toward a target skill level)
 - Workshop directory discovery
 - Objectives: a free-text game to-do list with a status per item (Planned/In
   Progress/Blocked/Complete, each with its own border treatment - dim glow/green

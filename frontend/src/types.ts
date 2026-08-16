@@ -204,4 +204,5 @@ export type TodosResponse = { items: TodoItem[]; statuses: TodoStatus[]; priorit
 export type AuthStatus = { secure_mode: boolean; authenticated: boolean };
 
 export type Page =
-  | "Dashboard" | "Sandbox" | "Server" | "Mods" | "Backups" | "Console" | "Players" | "To-Do";
+  | "Dashboard" | "Sandbox" | "Server" | "Mods" | "Backups" | "Console" | "Players"
+  | "RCON Tools" | "To-Do";

@@ -167,8 +167,6 @@ export const teleportPlayer = (username: string, to_username: string) =>
   request<RconCommandResult>("POST", "/api/rcon/teleport", { username, to_username });
 export const setPlayerGodmode = (username: string, enabled: boolean) =>
   request<RconCommandResult>("POST", "/api/rcon/godmode", { username, enabled });
-export const giveItem = (username: string, item: string, count: number) =>
-  request<RconCommandResult>("POST", "/api/rcon/give-item", { username, item, count });
 export const sendAnnouncement = (message: string) =>
   request<RconCommandResult>("POST", "/api/rcon/announce", { message });
 export const sendRconCommand = (command: string) =>

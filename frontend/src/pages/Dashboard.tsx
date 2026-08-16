@@ -3,7 +3,6 @@ import { AlertTriangle, Activity, HardDrive, Server as ServerIcon, Users } from 
 import { getPlayers, getServer } from "../api";
 import { usePolling } from "../hooks/usePolling";
 import { Metric } from "../components/Metric";
-import { Health } from "../components/Health";
 import type { PlayersResponse, ServerInfo } from "../types";
 
 const fmtBytes = (n: number) => {
@@ -105,13 +104,6 @@ export function Dashboard({ setToast }: { setToast: (msg: string) => void }) {
           ))}
         </section>
       )}
-
-      <section className="panel">
-        <div className="panel-title"><span>Server Health</span><span className="muted">Live</span></div>
-        <Health label="Zomboid data mounted" ok={true} />
-        <Health label="Workshop storage mounted" ok={true} />
-        <Health label="WebUI API" ok={true} />
-      </section>
     </div>
   );
 }

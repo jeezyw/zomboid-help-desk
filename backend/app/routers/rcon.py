@@ -12,7 +12,6 @@ from ..rcon_client import (
     rcon_execute,
 )
 from ..rcon_commands import (
-    cmd_additem,
     cmd_addxp,
     cmd_ban,
     cmd_godmode_player,
@@ -140,18 +139,6 @@ class GodmodeBody(BaseModel):
 async def godmode_player(body: GodmodeBody):
     detail = f"{body.username}: {'enabled' if body.enabled else 'disabled'}"
     return await _run_admin_command(cmd_godmode_player(body.username, body.enabled), "rcon.godmode", detail)
-
-
-class GiveItemBody(BaseModel):
-    username: str
-    item: str
-    count: int = 1
-
-
-@router.post("/api/rcon/give-item")
-async def give_item(body: GiveItemBody):
-    detail = f"{body.username}: {body.item} x{body.count}"
-    return await _run_admin_command(cmd_additem(body.username, body.item, body.count), "rcon.give_item", detail)
 
 
 @router.get("/api/rcon/perks")

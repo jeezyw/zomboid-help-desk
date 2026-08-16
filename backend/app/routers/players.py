@@ -3,8 +3,8 @@ falling back to best-effort log-scraping (see log_patterns.py) when it isn't. Th
 background poll_once()/poller_loop() below are the log-scraping fallback - left
 untouched by the RCON integration, since a connect-per-call RCON query is cheap
 enough to run live inside GET /api/players itself rather than needing its own
-background loop. Kick/ban/teleport/give-item live in routers/rcon.py and require
-RCON to be configured - see rcon_config.py.
+background loop. Kick/ban/teleport/godmode/etc. live in routers/rcon.py and
+require RCON to be configured - see rcon_config.py.
 """
 
 from __future__ import annotations

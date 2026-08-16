@@ -11,7 +11,7 @@ import { PendingBar } from "./PendingBar";
  * simply omits onToggleFavorite/onSetCategory/allCategories, which hides both. */
 export function SettingsEditor({
   categories, path, loading, error, emptyTitle, emptyBody, onApply,
-  onToggleFavorite, onSetCategory, allCategories,
+  onToggleFavorite, onSetCategory, allCategories, extraFieldsByCategory,
 }: {
   categories: SettingCategory[];
   path: string;
@@ -23,6 +23,12 @@ export function SettingsEditor({
   onToggleFavorite?: (key: string, favorite: boolean) => void;
   onSetCategory?: (key: string, category: string | null) => void;
   allCategories?: { id: string; title: string }[];
+  // Non-schema content (e.g. the RCON Host override, which lives in the webui's
+  // own db, not the .ini file) appended to the end of a specific category's field
+  // list - keyed by category id. Lets a caller bolt extra, differently-persisted
+  // fields onto a schema-driven category without SettingsEditor needing to know
+  // anything about them.
+  extraFieldsByCategory?: Record<string, ReactNode>;
 }) {
   const [pending, setPending] = useState<Record<string, any>>({});
   const [saving, setSaving] = useState(false);
@@ -191,6 +197,7 @@ export function SettingsEditor({
                   onSetCategory={onSetCategory}
                 />
               ))}
+              {extraFieldsByCategory?.[active.id]}
             </div>
           </section>
         </>

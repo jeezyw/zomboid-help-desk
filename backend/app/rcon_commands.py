@@ -4,9 +4,14 @@ Isolated in one small file for the same reason log_patterns.py isolates its rege
 these are transcribed from documented Project Zomboid console commands and have NOT
 been verified against a live server. Confidence levels:
 
-  HIGH   - players, kickuser, unbanuser, teleport, servermsg, additem (confirmed
-           against a live server 2026-08-10 - item id must be unquoted, e.g.
-           `additem "user" Base.308Bullets 2`, NOT `additem "user" "Base.308Bullets" 2`)
+  HIGH   - players, kickuser, unbanuser, teleport, servermsg (confirmed against a
+           live server 2026-08-10). additem was also confirmed then - item id must
+           be unquoted, e.g. `additem "user" Base.308Bullets 2`, NOT
+           `additem "user" "Base.308Bullets" 2` - but there's no cmd_additem here
+           anymore: additem is built client-side in serverCommands.ts's Command
+           Builder (RCON Tools tab) via the generic /api/rcon/command pass-through,
+           not its own backend endpoint, since give-item as a dedicated feature was
+           removed as redundant with the Command Builder.
   MEDIUM - banuser's flag syntax (-ip, -r "reason") - verify against real `help`
            output before relying on ban. addxp's syntax (`addxp "user" Perk=amount`,
            perk unquoted, mirroring additem's unquoted-argument convention) - NOT yet
@@ -48,13 +53,6 @@ def cmd_unban(username: str) -> str:
 
 def cmd_teleport(username: str, to_username: str) -> str:
     return f'teleport "{username}" "{to_username}"'
-
-
-def cmd_additem(username: str, item: str, count: int = 1) -> str:
-    # Confirmed against a live server (2026-08-10): the item id must NOT be quoted -
-    # quoting it gets parsed as a literal string (including the quote characters),
-    # which matches no real item and silently gives nothing.
-    return f'additem "{username}" {item} {count}'
 
 
 def cmd_addxp(username: str, perk: str, amount: int) -> str:

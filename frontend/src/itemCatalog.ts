@@ -30,7 +30,6 @@ export const ITEM_CATEGORIES = [
 
 export const ITEM_CATALOG: CatalogItem[] = [
   // --- Weapons (melee) ---
-  { id: "Base.BareHands", name: "Bare Hands", category: "Weapons" },
   { id: "Base.Axe_Old", name: "Axe", category: "Weapons" },
   { id: "Base.Axe", name: "Firefighter Axe", category: "Weapons" },
   { id: "Base.HandAxe_Old", name: "Hand Axe", category: "Weapons" },

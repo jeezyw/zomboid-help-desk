@@ -1,12 +1,11 @@
 import { useEffect, useState } from "react";
 import { AlertTriangle, Users } from "lucide-react";
 import {
-  banPlayer, getPerks, getPlayers, getRconConfig, giveItem, kickPlayer, sendAnnouncement,
-  setPlayerGodmode, setPlayerSkill, teleportPlayer,
+  banPlayer, getPlayers, getRconConfig, kickPlayer, sendAnnouncement,
+  setPlayerGodmode, teleportPlayer,
 } from "../api";
 import { usePolling } from "../hooks/usePolling";
-import { ItemPicker } from "../components/ItemPicker";
-import type { Perk, PlayersResponse, RconConfig } from "../types";
+import type { PlayersResponse, RconConfig } from "../types";
 
 function fmtDuration(seconds: number): string {
   const h = Math.floor(seconds / 3600);
@@ -256,21 +255,6 @@ function PlayerToolsPanel({
 }) {
   const [selected, setSelected] = useState<string | null>(online[0] ?? null);
   const [teleportTarget, setTeleportTarget] = useState("");
-  const [item, setItem] = useState("");
-  const [count, setCount] = useState(1);
-  const [perks, setPerks] = useState<Perk[]>([]);
-  const [maxLevel, setMaxLevel] = useState(10);
-  const [perk, setPerk] = useState("");
-  const [level, setLevel] = useState(5);
-  const [settingSkill, setSettingSkill] = useState(false);
-
-  useEffect(() => {
-    getPerks().then((r) => {
-      setPerks(r.perks);
-      setMaxLevel(r.max_level);
-      setPerk((p) => p || r.perks[0]?.id || "");
-    }).catch(() => {});
-  }, []);
 
   // `online` loads asynchronously (empty on first render), so the useState default
   // above almost always resolves to null and never gets a real player - the <select>
@@ -293,21 +277,6 @@ function PlayerToolsPanel({
   async function teleport() {
     if (!selected || !teleportTarget) return;
     await run(() => teleportPlayer(selected, teleportTarget), "Teleport");
-  }
-
-  async function give() {
-    if (!selected || !item) return;
-    await run(() => giveItem(selected, item, count), "Give item");
-  }
-
-  async function grantSkill() {
-    if (!selected || !perk) return;
-    setSettingSkill(true);
-    try {
-      await run(() => setPlayerSkill(selected, perk, level), "Adjust skill");
-    } finally {
-      setSettingSkill(false);
-    }
   }
 
   return (
@@ -335,43 +304,6 @@ function PlayerToolsPanel({
               </select>
             </div>
             <button onClick={teleport} disabled={!teleportTarget}>Teleport</button>
-          </div>
-
-          <div className="panel-title" style={{ marginTop: 20 }}><span>Give Item</span></div>
-          <ItemPicker value={item} onChange={setItem} />
-          <div style={{ display: "flex", alignItems: "center", gap: 10, marginTop: 12 }}>
-            <input type="number" min={1} value={count} onChange={(e) => setCount(Number(e.target.value))} style={{ width: 70 }} />
-            <button onClick={give} disabled={!item}>Give Item</button>
-          </div>
-
-          <div className="panel-title" style={{ marginTop: 20 }}><span>Adjust Skills</span></div>
-          <div className="notice notice-warning">
-            <AlertTriangle size={14} />
-            Grants XP toward the chosen level - it can't set an absolute level. A
-            player with existing progress in this skill will end up somewhat past
-            the level you pick, not exactly on it. Perk data is researched, not
-            confirmed against a live server yet - verify the result in-game.
-          </div>
-          <div className="settings-grid">
-            <div className="setting">
-              <label>Skill</label>
-              <select value={perk} onChange={(e) => setPerk(e.target.value)}>
-                {perks.map((p) => <option key={p.id} value={p.id}>{p.label}</option>)}
-              </select>
-            </div>
-            <div className="setting">
-              <label>Target Level</label>
-              <select value={level} onChange={(e) => setLevel(Number(e.target.value))}>
-                {Array.from({ length: maxLevel }, (_, i) => i + 1).map((lvl) => (
-                  <option key={lvl} value={lvl}>{lvl}</option>
-                ))}
-              </select>
-            </div>
-          </div>
-          <div style={{ marginTop: 12 }}>
-            <button onClick={grantSkill} disabled={!perk || settingSkill}>
-              {settingSkill ? "Granting…" : "Grant Skill Level"}
-            </button>
           </div>
         </>
       )}

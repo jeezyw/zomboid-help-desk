@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import {
   Activity, Database, ListChecks, LogOut, Package, Server as ServerIcon, Settings, Terminal, Users,
+  Wrench,
 } from "lucide-react";
 import { Toast } from "./components/Toast";
 import { Dashboard } from "./pages/Dashboard";
@@ -10,6 +11,7 @@ import { Mods } from "./pages/Mods";
 import { Backups } from "./pages/Backups";
 import { Console } from "./pages/Console";
 import { Players } from "./pages/Players";
+import { RconTools } from "./pages/RconTools";
 import { Objectives } from "./pages/Objectives";
 import { Login } from "./pages/Login";
 import { getAuthStatus, logout, setUnauthorizedHandler } from "./api";
@@ -17,8 +19,8 @@ import type { Page } from "./types";
 
 const NAV: [Page, any][] = [
   ["Dashboard", Activity], ["Sandbox", Settings], ["Server", ServerIcon],
-  ["Mods", Package], ["Players", Users], ["To-Do", ListChecks], ["Console", Terminal],
-  ["Backups", Database],
+  ["Mods", Package], ["Players", Users], ["RCON Tools", Wrench], ["To-Do", ListChecks],
+  ["Console", Terminal], ["Backups", Database],
 ];
 
 export function App() {
@@ -78,6 +80,7 @@ export function App() {
         {page === "Server" && <Server setToast={setToast} />}
         {page === "Mods" && <Mods setToast={setToast} />}
         {page === "Players" && <Players setToast={setToast} />}
+        {page === "RCON Tools" && <RconTools setToast={setToast} />}
         {page === "To-Do" && <Objectives setToast={setToast} />}
         {page === "Console" && <Console />}
         {page === "Backups" && <Backups setToast={setToast} />}

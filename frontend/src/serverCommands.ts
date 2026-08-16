@@ -121,7 +121,7 @@ export const SERVER_COMMANDS: ServerCommandDef[] = [
   },
   {
     id: "addxp", command: "addxp", label: "Give Skill XP", group: "Player Actions",
-    description: 'Give XP to a player. Use: /addxp "playername" perkname=xp -true (also on Players page as "Adjust Skills")',
+    description: 'Give XP to a player. Use: /addxp "playername" perkname=xp -true (also on RCON Tools as "Adjust Skills")',
     fields: [
       { key: "username", label: "Player", type: "player" },
       { key: "perk", label: "Perk (internal id, e.g. Woodwork)", type: "text" },
