@@ -30,11 +30,11 @@ either way. RCON is a plain TCP connection to the game process, and
 console/config/save data are read straight off the bind-mounted
 `ZOMBOID_DATA`/`WORKSHOP_DATA` directories.
 
-## Important
+## Secure Mode
 
 Before exposing the WebUI outside your LAN, put it behind HTTPS (e.g. a reverse proxy)
 and turn on secure mode (`SECURE_MODE=true` + `WEBUI_USERNAME`/`WEBUI_PASSWORD` - see
-Configuration below). Secure mode is off by default.
+Configuration below). This just makes the user login before they can access the ui.
 
 ## Deploy
 
@@ -44,7 +44,6 @@ under `environment:` and `volumes:` for your setup.
 docker compose up -d --build
 ```
 If that doesn't build correctly, just run
-
 ```bash
 sh ./builder.sh
 ```
@@ -52,7 +51,6 @@ This will build with a clean cache. First it will
 build the docker control agent then the webui.
 
 To use the webui open:
-
 ```text
 http://SERVER_IP:8080
 ```
@@ -85,20 +83,18 @@ an empty password).
 
 ## WebUI's own data
 
-The WebUI's SQLite database (audit log, config-change history, backup metadata,
-RCON host override, restart schedule, sandbox sorting/favorites, etc.) lives at
-`./webui-data/webui.db`, directly in this project directory via a host bind mount
-(not a named Docker volume) - so it's a plain file you can backup or
-copy Manual backups youcreate from the Backups page also land under 
-`./webui-data/backups/`. The To-Do page is deliberately kept OUT of that database.
-its own plain file lives at `./webui-data/todos.json`.
+The WebUI's SQLite database which lives at `./webui-data/webui.db`, directly 
+in this project directory via a host bind mount(not a named Docker volume) 
+so it's a plain file you can backup orcopy Manual backups youcreate from the 
+Backups page also land under `./webui-data/backups/`. The To-Do page is 
+deliberately kept OUT of that database.its own plain file lives at 
+`./webui-data/todos.json`.
 
 ## Feedback
 
 This is an early build being shared for testing - if something breaks or behaves
 oddly, lemme know what happened and what you were doing when it broke and I will 
 take a look when I can, and (if relevant) the output of
-
 ```bash
 docker compose logs zomboid-webui
 ```
