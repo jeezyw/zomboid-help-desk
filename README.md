@@ -81,13 +81,12 @@ If `SECURE_MODE` is `"true"`, `WEBUI_PASSWORD` must be set to something non-empt
 or the container refuses to start (fails fast rather than running "secure" with
 an empty password).
 
-## WebUI's own data
+## WebUI's Data
 
-The WebUI's SQLite database which lives at `./webui-data/webui.db`, directly 
-in this project directory via a host bind mount(not a named Docker volume) 
-so it's a plain file you can backup orcopy Manual backups youcreate from the 
-Backups page also land under `./webui-data/backups/`. The To-Do page is 
-deliberately kept OUT of that database.its own plain file lives at 
+The WebUI's SQLite databaselives at `./webui-data/webui.db`. 
+It's a plain file you can just copy it or make backups from the 
+Backups page. Stored under `./webui-data/backups/`. The To-Do page is 
+deliberately kept OUT of that database in its own plain file that lives at 
 `./webui-data/todos.json`.
 
 ## Feedback
