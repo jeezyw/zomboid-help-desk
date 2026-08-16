@@ -93,7 +93,7 @@ deliberately kept OUT of that database in its own plain file that lives at
 
 This is an early build being shared for testing - if something breaks or behaves
 oddly, lemme know what happened and what you were doing when it broke and I will 
-take a look when I can, and (if relevant) the output of
+take a look when I can. If you can send the output of
 ```bash
 docker compose logs zomboid-webui
 ```
