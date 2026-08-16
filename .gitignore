@@ -1,0 +1,29 @@
+# Runtime data - this app's own SQLite db, backups, and the Objectives file.
+# Never distribute someone else's live admin data.
+webui-data/
+
+# Python
+__pycache__/
+*.pyc
+.venv/
+
+# Node / frontend build output
+node_modules/
+frontend/dist/
+
+# Editor / OS cruft
+.DS_Store
+.vscode/
+.idea/
+
+# Claude Code local session config - machine-specific, not part of the app
+.claude/
+
+# Dev-only fixtures used while building the .ini/SandboxVars parsers - not
+# read by the app itself
+Test Files/
+
+# Local env overrides, if anyone still uses one despite docker-compose.yml
+# being the single source of config
+.env
+.env.local
