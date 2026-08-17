@@ -27,12 +27,6 @@ console tailing) works with zero Docker privilege seither way. Console, config,
 save data are read straight off the bind-mounted `ZOMBOID_DATA`/`WORKSHOP_DATA` 
 directories.
 
-## Secure Mode
-
-Before exposing the WebUI outside your LAN, put it behind HTTPS (e.g. a reverse proxy)
-and turn on secure mode (`SECURE_MODE=true` + `WEBUI_USERNAME`/`WEBUI_PASSWORD` - see
-Configuration below). This just makes the user login before they can access the WebUI.
-
 ## Deploying the Container
 
 Everything is configured directly in `docker-compose.yml`. Open it, edit the values
@@ -73,18 +67,24 @@ volumes:
 ports:
   - "8080:8000"                    # change the left side for a different host port
 ```
+## Secure Mode
+
+Before exposing the WebUI outside your LAN, put it behind HTTPS (e.g. a reverse proxy)
+and turn on secure mode (`SECURE_MODE=true` + `WEBUI_USERNAME`/`WEBUI_PASSWORD` - see
+Configuration below). This just makes the user login before they can access the WebUI.
 
 If `SECURE_MODE` is `"true"`, `WEBUI_PASSWORD` must be set to something non-empty
-or the container refuses to start (fails fast rather than running "secure" with
-an empty password).
+or the container refuses to start.
 
 ## WebUI's Data
 
 The WebUI's SQLite databaselives at `./webui-data/webui.db`. 
 It's a plain file you can just copy it or make backups from the 
-Backups page. Stored under `./webui-data/backups/`. The To-Do page is 
-deliberately kept OUT of that database in its own plain file that lives at 
-`./webui-data/todos.json`.
+Backups page. Stored under `./webui-data/backups/`. 
+
+The To-Do page is deliberately kept OUT of that database in its own plain file that lives at 
+`./webui-data/todos.json`. Use it for whatever. I keep game-related objectives in there for
+our little group of players and all of us can read it and add objectives.
 
 ## Feedback
 
