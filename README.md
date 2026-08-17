@@ -16,27 +16,24 @@ Current build: 0.3.1
 
 A single container:
 
-Browser -> WebUI/API -> Zomboid data (bind mounts) / RCON / Docker
-
 Docker-based Start/Stop/Restart and live game-process CPU/RAM stats are
 **optional** (`DOCKER_CONTROL_ENABLED` in `docker-compose.yml`, off by default) -
-they work by shelling out to the `docker` CLI against
-`/var/run/docker.sock`, which is bind-mounted into the container. That grants the
-WebUI container host-root-equivalent access to the Docker daemon. Set
-`DOCKER_CONTROL_ENABLED` to `"false"` and comment out the `docker.sock` mount for
-a fully unprivileged container - everything else (settings editors, mods,
-backups, RCON admin tools, console tailing) works with zero Docker privileges
-either way. RCON is a plain TCP connection to the game process, and
-console/config/save data are read straight off the bind-mounted
-`ZOMBOID_DATA`/`WORKSHOP_DATA` directories.
+they work by shelling out to the `docker` CLI against `/var/run/docker.sock`, 
+which is bind-mounted into the container. That grants the WebUI container 
+host-root-equivalent access to the Docker daemon. Set`DOCKER_CONTROL_ENABLED` 
+to `"false"` and comment out the `docker.sock` mount fora fully unprivileged 
+container. Everything else (settings editors, mods,backups, RCON admin tools, 
+console tailing) works with zero Docker privilege seither way. Console, config, 
+save data are read straight off the bind-mounted `ZOMBOID_DATA`/`WORKSHOP_DATA` 
+directories.
 
 ## Secure Mode
 
 Before exposing the WebUI outside your LAN, put it behind HTTPS (e.g. a reverse proxy)
 and turn on secure mode (`SECURE_MODE=true` + `WEBUI_USERNAME`/`WEBUI_PASSWORD` - see
-Configuration below). This just makes the user login before they can access the ui.
+Configuration below). This just makes the user login before they can access the WebUI.
 
-## Deploy
+## Deploying the Container
 
 Everything is configured directly in `docker-compose.yml`. Open it, edit the values
 under `environment:` and `volumes:` for your setup.
