@@ -1,0 +1,3 @@
+name=ZHD Position Tracker
+description=Periodically writes online player positions to a JSON file, read by Zomboid Help Desk's Live Map feature (LIVE_MAP_ENABLED). Server-side only - does nothing on a client.
+id=ZHDPositionTracker

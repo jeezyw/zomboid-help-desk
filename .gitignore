@@ -27,3 +27,11 @@ Test Files/
 # being the single source of config
 .env
 .env.local
+
+# Maintainer's source image for the Base Map (backend/app/map/b42_map.jpg,
+# ~206MB) - exceeds GitHub's 100MB per-file push limit, and isn't needed for
+# normal operation anyway: the app ships with the already-tiled output
+# (backend/app/map/base_tiles/) and a matching default calibration baked in.
+# Only needed locally if you want to re-tile from scratch via the Settings
+# tab's "Tile Base Map" button.
+backend/app/map/b42_map.jpg

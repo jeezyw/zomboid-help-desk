@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import {
-  Activity, Database, ListChecks, LogOut, Package, Server as ServerIcon, Settings, Terminal, Users,
-  Wrench,
+  Activity, Database, ListChecks, LogOut, MapPin, Package, Server as ServerIcon, Settings,
+  SlidersHorizontal, Terminal, Users, Wrench,
 } from "lucide-react";
 import { Toast } from "./components/Toast";
 import { Dashboard } from "./pages/Dashboard";
@@ -12,6 +12,8 @@ import { Backups } from "./pages/Backups";
 import { Console } from "./pages/Console";
 import { Players } from "./pages/Players";
 import { RconTools } from "./pages/RconTools";
+import { LiveMap } from "./pages/LiveMap";
+import { Settings as SettingsPage } from "./pages/Settings";
 import { Objectives } from "./pages/Objectives";
 import { Login } from "./pages/Login";
 import { getAuthStatus, logout, setUnauthorizedHandler } from "./api";
@@ -19,8 +21,8 @@ import type { Page } from "./types";
 
 const NAV: [Page, any][] = [
   ["Dashboard", Activity], ["Sandbox", Settings], ["Server", ServerIcon],
-  ["Mods", Package], ["Players", Users], ["RCON Tools", Wrench], ["To-Do", ListChecks],
-  ["Console", Terminal], ["Backups", Database],
+  ["Mods", Package], ["Players", Users], ["RCON Tools", Wrench], ["Settings", SlidersHorizontal],
+  ["Live Map", MapPin], ["To-Do", ListChecks], ["Console", Terminal], ["Backups", Database],
 ];
 
 export function App() {
@@ -81,6 +83,8 @@ export function App() {
         {page === "Mods" && <Mods setToast={setToast} />}
         {page === "Players" && <Players setToast={setToast} />}
         {page === "RCON Tools" && <RconTools setToast={setToast} />}
+        {page === "Settings" && <SettingsPage setToast={setToast} />}
+        {page === "Live Map" && <LiveMap setToast={setToast} />}
         {page === "To-Do" && <Objectives setToast={setToast} />}
         {page === "Console" && <Console />}
         {page === "Backups" && <Backups setToast={setToast} />}

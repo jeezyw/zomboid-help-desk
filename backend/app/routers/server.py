@@ -5,7 +5,7 @@ import psutil
 from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel
 
-from .. import config, disk_usage, docker_control, restart_manager, server_files
+from .. import config, disk_usage, docker_control, game_server, restart_manager, server_files
 from ..db import audit, get_setting, set_setting, utcnow
 from ..profiles import SELECTED_PROFILE_KEY
 
@@ -27,18 +27,20 @@ async def server():
     disk = shutil.disk_usage(config.DATA) if config.DATA.exists() else None
     data_size = disk_usage.get_cached() or {}
 
-    # Best-effort: the game server's own CPU/memory, via `docker stats` - only
-    # attempted when Docker control is enabled (config.DOCKER_CONTROL_ENABLED),
-    # since without the socket mounted this would just fail every single poll. A
-    # failure here (docker CLI missing, container not running) must NOT break the
-    # rest of this response - host metrics above are independently useful and
-    # always shown regardless. cpu_percent_raw is Docker's "percent of one core"
-    # figure; dividing by cpu_count normalizes it onto the same 0-100-ish scale as
-    # the host cpu_percent above so the two are directly comparable at a glance.
+    # Best-effort: the game server's own CPU/memory. SERVER_MODE=bundled reads it
+    # locally via psutil (game_server.py, no Docker involved); SERVER_MODE=external
+    # goes through `docker stats`, only attempted when Docker control is enabled
+    # (config.DOCKER_CONTROL_ENABLED), since without the socket mounted this would
+    # just fail every single poll. A failure here must NOT break the rest of this
+    # response - host metrics above are independently useful and always shown
+    # regardless. cpu_percent_raw is a percentage of ONE core; dividing by
+    # cpu_count normalizes it onto the same 0-100-ish scale as the host
+    # cpu_percent above so the two are directly comparable at a glance.
     process = {"cpu_percent": None, "memory_bytes": None}
-    if config.DOCKER_CONTROL_ENABLED:
+    if config.SERVER_MODE == "bundled" or config.DOCKER_CONTROL_ENABLED:
         try:
-            raw = await docker_control.stats()
+            backend = game_server if config.SERVER_MODE == "bundled" else docker_control
+            raw = await backend.stats()
             cpu_count = psutil.cpu_count() or 1
             process = {
                 "cpu_percent": raw["cpu_percent_raw"] / cpu_count,
@@ -74,6 +76,7 @@ async def server():
         },
         "process": process,
         "docker_control_enabled": config.DOCKER_CONTROL_ENABLED,
+        "server_mode": config.SERVER_MODE,
     }
 
 
@@ -105,6 +108,24 @@ async def cancel_pending_action():
     return {"ok": restart_manager.cancel_pending()}
 
 
+# --- SERVER_MODE=bundled dedicated server launching settings ---
+
+class BundledServerSettings(BaseModel):
+    name: str
+
+
+@router.get("/api/server/bundled-settings")
+async def get_bundled_server_settings():
+    return {"name": game_server.get_server_name(), "running": game_server.is_running()}
+
+
+@router.post("/api/server/bundled-settings")
+async def set_bundled_server_settings(body: BundledServerSettings):
+    name = game_server.set_server_name(body.name)
+    audit("server.bundled_settings", name)
+    return {"name": name, "running": game_server.is_running()}
+
+
 class ServerActionBody(BaseModel):
     # Per-click override of the restart-warning delay for THIS action only (e.g. the
     # dropdown next to the Stop/Restart buttons) - omit to use the persisted default
@@ -118,18 +139,21 @@ async def server_action(action: str, body: ServerActionBody | None = None):
         raise HTTPException(400, "Unsupported action")
 
     if action == "start":
-        if not config.DOCKER_CONTROL_ENABLED:
-            raise HTTPException(
-                400,
-                "Docker control is disabled. Set DOCKER_CONTROL_ENABLED=true and "
-                "mount /var/run/docker.sock in docker-compose.yml to enable "
-                "Start/Stop/Restart.",
-            )
         # No RCON warning applies here - nothing to warn, no one is connected to a
         # stopped server. RCON also can't start a stopped process in the first
         # place: it's a TCP connection to the running game, and there's nothing to
         # connect to until the container (and the process inside it) is already up.
-        result = await docker_control.start()
+        if config.SERVER_MODE == "bundled":
+            result = await game_server.start()
+        else:
+            if not config.DOCKER_CONTROL_ENABLED:
+                raise HTTPException(
+                    400,
+                    "Docker control is disabled. Set DOCKER_CONTROL_ENABLED=true and "
+                    "mount /var/run/docker.sock in docker-compose.yml to enable "
+                    "Start/Stop/Restart.",
+                )
+            result = await docker_control.start()
         audit("server.start")
         return result
 

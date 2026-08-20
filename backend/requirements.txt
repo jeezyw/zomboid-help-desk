@@ -3,3 +3,6 @@ uvicorn[standard]==0.35.0
 pydantic==2.11.7
 psutil==7.0.0
 httpx==0.28.1
+# Also a pzmap2dzi dependency (installed separately in the Dockerfile from its own
+# requirements.txt) - listed here too since map_render.py imports it directly.
+ruamel.yaml==0.19.1

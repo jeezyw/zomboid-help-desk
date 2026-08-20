@@ -2,10 +2,12 @@
 same file the ini editor already reads/writes) and are read live on every call rather
 than cached, so they can never drift from the file that's the actual source of truth.
 Host is a WebUI-owned setting (kv table) since it's not a PZ server concept - it
-defaults to the game container's name (best-effort Docker DNS), which only resolves
-if the WebUI ends up sharing a Docker network with it; otherwise an explicit
-host/IP override is required. See routers/rcon.py's /api/rcon/test for diagnosing
-which of these is the case.
+defaults to "localhost" for SERVER_MODE=bundled (the game runs as a subprocess of
+this same container, see game_server.py) or the game container's name (best-effort
+Docker DNS, only resolves if the WebUI shares a Docker network with it) for
+SERVER_MODE=external; either way an explicit host/IP override is available if the
+guess is wrong. See routers/rcon.py's /api/rcon/test for diagnosing which of these
+is the case.
 """
 
 from __future__ import annotations
@@ -24,7 +26,9 @@ class RconNotConfiguredError(Exception):
 
 def get_rcon_host() -> str:
     override = get_setting(RCON_HOST_OVERRIDE_KEY)
-    return override if override else config.ZOMBOID_CONTAINER
+    if override:
+        return override
+    return "localhost" if config.SERVER_MODE == "bundled" else config.ZOMBOID_CONTAINER
 
 
 def set_rcon_host_override(host: str | None):

@@ -64,6 +64,27 @@ export type ServerInfo = {
     memory_bytes: number | null;
   };
   docker_control_enabled: boolean;
+  server_mode: "external" | "bundled";
+};
+
+export type SteamStatus = {
+  running: boolean;
+  progress_pct: number | null;
+  last_line: string | null;
+  done_at: string | null;
+  error: string | null;
+};
+
+export type BundledServerSettings = { name: string; running: boolean };
+
+export type MapRenderStatus = {
+  running: boolean;
+  step: string | null;
+  progress_pct: number | null;
+  last_line: string | null;
+  done_at: string | null;
+  error: string | null;
+  cancelled: boolean;
 };
 
 export type ModEntry = {
@@ -164,6 +185,28 @@ export type RconCommandResult = { ok: boolean; response: string };
 export type Perk = { id: string; label: string; curve: "regular" | "passive" };
 export type PerksResponse = { perks: Perk[]; max_level: number };
 
+export type MapConfig = { enabled: boolean; tiles_available: boolean };
+export type MapPlayer = { username: string; x: number; y: number; z: number };
+export type MapPlayersResponse = { players: MapPlayer[]; updated_at: string | null; stale: boolean };
+export type MapSetupStatus = { mod_installed: boolean; enabled: boolean; tiles_available: boolean };
+
+export type CalibrationPoint = { world_x: number; world_y: number; pixel_x: number; pixel_y: number };
+export type AffineTransform = { a: number; b: number; c: number; d: number; e: number; f: number };
+export type Calibration = { points: CalibrationPoint[]; transform: AffineTransform | null };
+
+export type BaseMapStatus = {
+  running: boolean;
+  last_line: string | null;
+  done_at: string | null;
+  error: string | null;
+  cancelled: boolean;
+  width: number | null;
+  height: number | null;
+  max_zoom: number | null;
+  tile_size: number;
+  tiles_available: boolean;
+};
+
 export type PendingAction = {
   action: "stop" | "restart";
   reason: string;
@@ -205,4 +248,4 @@ export type AuthStatus = { secure_mode: boolean; authenticated: boolean };
 
 export type Page =
   | "Dashboard" | "Sandbox" | "Server" | "Mods" | "Backups" | "Console" | "Players"
-  | "RCON Tools" | "To-Do";
+  | "RCON Tools" | "Settings" | "Live Map" | "To-Do";

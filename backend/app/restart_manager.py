@@ -1,15 +1,17 @@
 """Owns the configurable stop/restart warning delay and the single in-process
-"pending action" that warns via RCON, waits, then performs the real Docker action -
+"pending action" that warns via RCON, waits, then performs the real stop/restart -
 as a background asyncio.Task so callers (the manual HTTP endpoint, the scheduler
-tick) never block for the delay.
+tick) never block for the delay. The actual action goes through docker_control.py
+(SERVER_MODE=external) or game_server.py (SERVER_MODE=bundled) - see
+_do_server_action.
 
 Only one pending action at a time. request_action() is deliberately NOT async - it
 just spawns the background task and returns immediately, so both an `await`ing HTTP
 handler and a plain synchronous call from scheduler.py's tick work the same way.
 
-Lazy-imports docker_control/rcon_client/players inside the task body (not at
-module level) to avoid a circular import with routers/server.py and scheduler.py,
-which both import this module.
+Lazy-imports docker_control/game_server/rcon_client/players inside the task body
+(not at module level) to avoid a circular import with routers/server.py and
+scheduler.py, which both import this module.
 """
 
 from __future__ import annotations
@@ -69,11 +71,12 @@ async def _send_warning(message: str) -> None:
         audit("rcon.warning_failed", str(e))
 
 
-async def _do_docker_action(action: str) -> dict:
-    from . import docker_control
+async def _do_server_action(action: str) -> dict:
+    from . import docker_control, game_server
     from .routers.players import close_all_open_sessions
 
-    result = await getattr(docker_control, action)()
+    backend = game_server if config.SERVER_MODE == "bundled" else docker_control
+    result = await getattr(backend, action)()
     audit(f"server.{action}", "via restart_manager")
     close_all_open_sessions(reason=f"server_{action}")
     return result
@@ -89,7 +92,7 @@ def request_action(action: str, reason: str, warning_minutes: int | None = None)
     if action not in ("stop", "restart"):
         raise ValueError(f"Unsupported action for request_action: {action}")
 
-    if not config.DOCKER_CONTROL_ENABLED:
+    if config.SERVER_MODE != "bundled" and not config.DOCKER_CONTROL_ENABLED:
         return {
             "ok": False,
             "detail": "Docker control is disabled. Set DOCKER_CONTROL_ENABLED=true "
@@ -120,7 +123,7 @@ def request_action(action: str, reason: str, warning_minutes: int | None = None)
             else:
                 msg = f"Server {verb} now"
                 await _send_warning(f"{msg}: {reason}" if reason else msg)
-            await _do_docker_action(action)
+            await _do_server_action(action)
         finally:
             _pending_task = None
             _pending_info = None

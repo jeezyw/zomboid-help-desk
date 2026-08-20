@@ -55,17 +55,20 @@ def _installed_by_alias() -> dict[str, dict]:
     return lookup
 
 
-@router.post("/api/mods/enable")
-async def enable_mod(body: ModIdBody):
+def enable_mod_by_id(mod_id: str) -> dict:
+    """Plain function version of POST /api/mods/enable's logic, so other
+    backend code (e.g. live_map.py's mod-install flow) can enable a mod
+    without going through the HTTP layer - same lazy-import-from-a-router
+    pattern restart_manager.py already uses for routers/players.py."""
     load_order, workshop_items = _current_lists()
     lookup = _installed_by_alias()
-    match = lookup.get(body.mod_id)
-    aliases = _aliases(match) if match else {body.mod_id}
+    match = lookup.get(mod_id)
+    aliases = _aliases(match) if match else {mod_id}
 
     if aliases & set(load_order):
         return {"ok": True, "note": "Already enabled."}
 
-    load_order = [*load_order, body.mod_id]
+    load_order = [*load_order, mod_id]
     workshop_id = match.get("workshop_id") if match else None
     if workshop_id and workshop_id not in workshop_items:
         workshop_items = [*workshop_items, workshop_id]
@@ -74,6 +77,11 @@ async def enable_mod(body: ModIdBody):
         "Mods": render_list_field(load_order),
         "WorkshopItems": render_list_field(workshop_items),
     })
+
+
+@router.post("/api/mods/enable")
+async def enable_mod(body: ModIdBody):
+    return enable_mod_by_id(body.mod_id)
 
 
 @router.post("/api/mods/disable")

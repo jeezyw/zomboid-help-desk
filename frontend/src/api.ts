@@ -1,8 +1,10 @@
 import type {
-  ApplyPresetResult, AuthStatus, Backup, ConfigChange, LogLine, ModsResponse, PendingAction,
-  PerksResponse, PlayersResponse, RconCommandResult, RconConfig, RconTestResult, RetentionPolicy,
-  SandboxPreset, ScheduleConfig, ServerActionResult, ServerInfo, ServerProfile, SettingCategory,
-  TodoItem, TodosResponse, WorkshopItem, WorkshopQueueResult,
+  ApplyPresetResult, AuthStatus, Backup, BaseMapStatus, BundledServerSettings, Calibration,
+  CalibrationPoint, ConfigChange, LogLine, MapConfig, MapPlayersResponse, MapRenderStatus,
+  MapSetupStatus, ModsResponse, PendingAction, PerksResponse, PlayersResponse, RconCommandResult,
+  RconConfig, RconTestResult, RetentionPolicy, SandboxPreset, ScheduleConfig, ServerActionResult,
+  ServerInfo, ServerProfile, SettingCategory, SteamStatus, TodoItem, TodosResponse, WorkshopItem,
+  WorkshopQueueResult,
 } from "./types";
 
 class ApiError extends Error {}
@@ -174,3 +176,41 @@ export const sendRconCommand = (command: string) =>
 export const getPerks = () => request<PerksResponse>("GET", "/api/rcon/perks");
 export const setPlayerSkill = (username: string, perk: string, level: number) =>
   request<RconCommandResult>("POST", "/api/rcon/set-skill", { username, perk, level });
+
+// --- Live Map ---
+export const getMapConfig = () => request<MapConfig>("GET", "/api/map/config");
+export const getMapPlayers = () => request<MapPlayersResponse>("GET", "/api/map/players");
+export const getMapSetupStatus = () => request<MapSetupStatus>("GET", "/api/map/setup-status");
+export const setupLiveMap = () =>
+  request<{ ok: boolean; detail?: string; mod_installed?: boolean; enabled?: boolean }>(
+    "POST", "/api/map/setup"
+  );
+
+export const getCalibration = () => request<Calibration>("GET", "/api/map/calibration");
+export const setCalibration = (points: CalibrationPoint[]) =>
+  request<Calibration>("POST", "/api/map/calibration", { points });
+export const clearCalibration = () => request<{ ok: boolean }>("DELETE", "/api/map/calibration");
+
+// --- Steam / bundled server files ---
+export const startSteamInstall = () =>
+  request<{ ok: boolean; detail?: string; status: SteamStatus }>("POST", "/api/steam/install");
+export const getSteamStatus = () => request<SteamStatus>("GET", "/api/steam/status");
+
+// --- Bundled dedicated server settings ---
+export const getBundledServerSettings = () =>
+  request<BundledServerSettings>("GET", "/api/server/bundled-settings");
+export const setBundledServerSettings = (name: string) =>
+  request<BundledServerSettings>("POST", "/api/server/bundled-settings", { name });
+
+// --- Map rendering ---
+export const startMapRender = () =>
+  request<{ ok: boolean; detail?: string; status: MapRenderStatus }>("POST", "/api/map/render/start");
+export const getMapRenderStatus = () => request<MapRenderStatus>("GET", "/api/map/render/status");
+export const cancelMapRender = () =>
+  request<{ ok: boolean; detail?: string; status?: MapRenderStatus }>("POST", "/api/map/render/cancel");
+
+export const getBaseMapStatus = () => request<BaseMapStatus>("GET", "/api/map/base/tile/status");
+export const startBaseMapTile = () =>
+  request<{ ok: boolean; detail?: string; status?: BaseMapStatus }>("POST", "/api/map/base/tile/start");
+export const cancelBaseMapTile = () =>
+  request<{ ok: boolean; detail?: string; status?: BaseMapStatus }>("POST", "/api/map/base/tile/cancel");

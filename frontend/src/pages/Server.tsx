@@ -1,11 +1,12 @@
 import { useEffect, useState } from "react";
 import {
-  AlertTriangle, Clock, Info, Play, Power, RotateCw, Square, XCircle,
+  AlertTriangle, Clock, Download, Info, Play, Power, RotateCw, Square, XCircle,
 } from "lucide-react";
 import {
-  cancelPendingAction, getIniFields, getPendingAction, getProfiles, getRconConfig,
-  getRestartWarning, getSchedule, getServer, putIni, selectProfile, serverAction,
-  setRconHostOverride, setRestartWarning, setSchedule, testRconConnection,
+  cancelPendingAction, getBundledServerSettings, getIniFields, getPendingAction, getProfiles,
+  getRconConfig, getRestartWarning, getSchedule, getServer, putIni, selectProfile,
+  serverAction, setBundledServerSettings, setRconHostOverride, setRestartWarning, setSchedule,
+  testRconConnection,
 } from "../api";
 import { usePolling } from "../hooks/usePolling";
 import { SettingsEditor } from "../components/SettingsEditor";
@@ -19,9 +20,10 @@ export function Server({ setToast }: { setToast: (msg: string) => void }) {
   const [profiles, setProfiles] = useState<ServerProfile[]>([]);
   const [selected, setSelected] = useState<string | null>(null);
   const [rcon, setRcon] = useState<RconConfig | null>(null);
-  // A deploy-time setting (DOCKER_CONTROL_ENABLED), not something that changes at
-  // runtime - one fetch on mount is enough, no need to poll it.
+  // Deploy-time settings (DOCKER_CONTROL_ENABLED/SERVER_MODE), not something
+  // that changes at runtime - one fetch on mount is enough, no need to poll it.
   const [dockerControlEnabled, setDockerControlEnabled] = useState(false);
+  const [serverMode, setServerMode] = useState<"external" | "bundled">("external");
 
   async function loadProfiles() {
     try {
@@ -36,7 +38,10 @@ export function Server({ setToast }: { setToast: (msg: string) => void }) {
   useEffect(() => {
     loadProfiles();
     getRconConfig().then(setRcon).catch(() => {});
-    getServer().then((s) => setDockerControlEnabled(s.docker_control_enabled)).catch(() => {});
+    getServer().then((s) => {
+      setDockerControlEnabled(s.docker_control_enabled);
+      setServerMode(s.server_mode);
+    }).catch(() => {});
   }, []);
 
   async function onSelect(name: string) {
@@ -52,11 +57,59 @@ export function Server({ setToast }: { setToast: (msg: string) => void }) {
   return (
     <>
       <ServerControlPanel setToast={setToast} dockerControlEnabled={dockerControlEnabled} />
+      {serverMode === "bundled" && <BundledServerPanel setToast={setToast} />}
       <ServerFilesPanel profiles={profiles} selected={selected} onSelect={onSelect} />
       <SchedulePanel setToast={setToast} rconConfigured={rcon?.password_set ?? false} />
       <IniEditor setToast={setToast} rcon={rcon} onRconChange={setRcon} />
       <AboutPanel />
     </>
+  );
+}
+
+function BundledServerPanel({ setToast }: { setToast: (msg: string) => void }) {
+  const [name, setName] = useState("");
+  const [savingName, setSavingName] = useState(false);
+
+  useEffect(() => {
+    getBundledServerSettings().then((s) => setName(s.name)).catch(() => {});
+  }, []);
+
+  async function saveName() {
+    if (!name.trim()) return;
+    setSavingName(true);
+    try {
+      const s = await setBundledServerSettings(name.trim());
+      setName(s.name);
+      setToast("Server name saved.");
+    } catch (e: any) {
+      setToast(e.message || "Could not save the server name.");
+    } finally {
+      setSavingName(false);
+    }
+  }
+
+  return (
+    <section className="panel" style={{ marginBottom: 18 }}>
+      <div className="panel-title"><span>Dedicated Server</span><Download size={16} /></div>
+
+      <p className="muted" style={{ marginTop: 0 }}>
+        Bundled server mode - this app installs and runs the Project Zomboid dedicated
+        server itself, as a subprocess of this container (no Docker access needed). Set a
+        server name, install/update the files from the Install Server Files panel below,
+        then use Start above to launch it for the first time; the server generates its own
+        config on first boot, which will appear in Server Files below once it does.
+      </p>
+
+      <div className="settings-grid">
+        <div className="setting">
+          <label>Server Name</label>
+          <input
+            type="text" value={name} onChange={(e) => setName(e.target.value)}
+            onBlur={saveName} disabled={savingName} placeholder="servertest"
+          />
+        </div>
+      </div>
+    </section>
   );
 }
 
@@ -202,7 +255,7 @@ function ServerControlPanel({
   );
 }
 
-const BUILD_VERSION = "0.3.1";
+const BUILD_VERSION = "0.4.1";
 
 function AboutPanel() {
   return (

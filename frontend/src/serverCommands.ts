@@ -110,16 +110,6 @@ export const SERVER_COMMANDS: ServerCommandDef[] = [
     build: (v) => `teleportplayer ${q(v.player1)} ${q(v.player2)}`,
   },
   {
-    id: "teleportto", command: "teleportto", label: "Teleport to Coordinates", group: "Player Actions",
-    description: "Teleport the admin connection to world coordinates.",
-    fields: [
-      { key: "x", label: "X", type: "number" },
-      { key: "y", label: "Y", type: "number" },
-      { key: "z", label: "Z", type: "number-optional", placeholder: "0" },
-    ],
-    build: (v) => `teleportto ${v.x},${v.y},${v.z || 0}`,
-  },
-  {
     id: "addxp", command: "addxp", label: "Give Skill XP", group: "Player Actions",
     description: 'Give XP to a player. Use: /addxp "playername" perkname=xp -true (also on RCON Tools as "Adjust Skills")',
     fields: [
@@ -137,7 +127,10 @@ export const SERVER_COMMANDS: ServerCommandDef[] = [
       { key: "username", label: "Player", type: "player" },
       { key: "level", label: "Access Level", type: "select", options: ["Admin", "Moderator", "Overseer", "GM", "Observer"] },
     ],
-    build: (v) => `setaccesslevel ${q(v.username)} ${q(v.level)}`,
+    // Dropdown labels match PZ's real display names (capitalized), but the
+    // RCON setaccesslevel command specifically wants the level lowercase -
+    // confirmed against a live server (it silently no-ops on "Admin").
+    build: (v) => `setaccesslevel ${q(v.username)} ${q(String(v.level).toLowerCase())}`,
   },
   {
     id: "setpassword", command: "setpassword", label: "Set Password", group: "Player Actions",

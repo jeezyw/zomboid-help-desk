@@ -6,19 +6,21 @@ services:
     container_name: zomboid-webui
     restart: unless-stopped
     environment:
-      # Name of your existing Project Zomboid server container. Used as the RCON
-      # host guess always, and (if DOCKER_CONTROL_ENABLED below) as the target of
-      # Docker start/stop/restart/stats too.
+      # Name of an existing Project Zomboid server container, only relevant
+      # for SERVER_MODE=external below.
       ZOMBOID_CONTAINER: zomboid-b42
       ZOMBOID_DATA: /data/zomboid
       WORKSHOP_DATA: /data/workshop
       DB_PATH: /app/data/webui.db
       TZ: UTC
-      # If your Zomboid server also runs in a Docker container:
-      # Set to "true" AND uncomment the docker.sock mount below to enable the
-      # Start/Stop/Restart buttons and live game-process CPU/RAM stats. This
-      # grants the container host-root-equivalent access via the Docker socket -
-      # only enable it if you're comfortable with that trade for the convenience.
+      # Only relevant for SERVER_MODE=external, where the server runs in its
+      # own separate Docker container: set to "true" AND uncomment the
+      # docker.sock mount below to enable the Start/Stop/Restart buttons and
+      # live game-process CPU/RAM stats. This grants the container
+      # host-root-equivalent access via the Docker socket - only enable it if
+      # you're comfortable with that trade for the convenience.
+      # Not needed at all for SERVER_MODE=bundled - that mode runs the game as
+      # a subprocess of this same container instead, no Docker access required.
       DOCKER_CONTROL_ENABLED: "false"
       # Set to "true" (and set WEBUI_USERNAME/WEBUI_PASSWORD to your own values
       # below) to require a login before the app can be used - recommended if
@@ -28,6 +30,25 @@ services:
       SECURE_MODE: "false"
       WEBUI_USERNAME: admin
       WEBUI_PASSWORD: ""
+      # Optional Live Map tab: an isometric map with a live player-position list
+      # (via the ZHDPositionTracker companion mod, see
+      # mod/ZHDPositionTracker/README.md) and rendered tiles (via the Live Map
+      # tab's own Render Map button - see MAP_TILES_DATA/GAME_FILES_DATA below).
+      # Leave "false" until both are set up.
+      LIVE_MAP_ENABLED: "false"
+      MAP_TILES_DATA: /data/map-tiles
+      # Where steamcmd installs PZ dedicated server files - needed for
+      # SERVER_MODE=bundled, and/or for the Live Map tab's Render Map button
+      # (which needs the game's texture packs). Configure everything about
+      # bundled server hosting itself (server name, install/update, launch)
+      # from the Server tab's dedicated server panel in the app - not here.
+      GAME_FILES_DATA: /data/game-files
+      # "external" (default) - manage a server that runs in its own separate
+      # Docker container, named by ZOMBOID_CONTAINER above.
+      # "bundled" - this app installs (via steamcmd) and runs its own PZ
+      # server as a subprocess of this same container instead - see the
+      # Server tab's dedicated server panel.
+      SERVER_MODE: external
     volumes:
       # Point these at your actual Zomboid data / Workshop mod directories on the host.
       - /path/to/your/zomboid/data:/data/zomboid
@@ -36,6 +57,14 @@ services:
       # Only needed if DOCKER_CONTROL_ENABLED is "true" above - leave commented
       # out (and that set to "false") for a fully unprivileged container.
       # - /var/run/docker.sock:/var/run/docker.sock
+      # Only needed if LIVE_MAP_ENABLED is "true" above.
+      # - /path/to/your/rendered/map/tiles:/data/map-tiles
+      # Only needed for SERVER_MODE=bundled, or to use the Live Map tab's
+      # Render Map button.
+      # - /path/to/your/game-files:/data/game-files
     ports:
       # host_port:container_port - change the left side to use a different host port.
       - "8080:8000"
+      # Only needed for SERVER_MODE=bundled - the game's own ports.
+      # - "16261:16261/udp"
+      # - "16262:16262/udp"
