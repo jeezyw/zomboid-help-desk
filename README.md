@@ -132,15 +132,14 @@ the app, not `docker-compose.yml`:
 ## Bundled Server Hosting
 
 Optional (`SERVER_MODE: bundled`). Lets this app install and run its own PZ
-dedicated server via steamcmd, for when you don't already have one running
-elsewhere - instead of just managing an external server, which is still the
+dedicated server rather than managing an external server, which is still the
 default (`SERVER_MODE: external`). The server runs as a **subprocess of this
 same container** - no separate container, no Docker socket, no
 `DOCKER_CONTROL_ENABLED` needed for this mode at all. Tradeoff: restarting/
 updating the webui container also stops the game server.
 
 1. Set `SERVER_MODE: bundled` in `docker-compose.yml` and uncomment the
-   `game-files` volume line and pick a volume location.
+   `game-files` volume line and pick a volume location. Rebuild the container.
 2. From the Server tab's "Dedicated Server" panel: set a server name, then
    Install/Update Server Files (steamcmd).
 3. Use the existing Start button to launch it for the first time - the server
