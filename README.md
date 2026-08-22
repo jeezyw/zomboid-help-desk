@@ -1,8 +1,8 @@
 # Zomboid Help Desk
 
-A self-hosted admin web UI for a Project Zomboid dedicated server: sandbox/.ini
-editors, mod management, backups, scheduled restarts, RCON player tools, a
-console viewer, and more - all in one Docker container.
+A self-hosted admin web UI for a Project Zomboid dedicated server:
+settings, mod management, player map, backups, scheduled restarts, RCON 
+player tools, aconsole viewer, and more - all in one Docker container.
 
 Current build: 0.4.1
 
