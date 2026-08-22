@@ -304,6 +304,17 @@ export function Settings({ setToast }: { setToast: (msg: string) => void }) {
             {busy ? "Re-running…" : "Re-run Setup"}
           </button>
         )}
+
+        <p className="muted" style={{ marginTop: 14, marginBottom: 8 }}>
+          Since ZHDPositionTracker isn't a real Steam Workshop item, each
+          connecting player needs their own local copy to pass the game's mod
+          compatibility check (it has no client-side code at all, so this is
+          purely a formality - see the README's Live Map section). Send them
+          this zip and have them extract it into their own <code>Zomboid/mods/</code> folder.
+        </p>
+        <a className="button" href="/api/map/mod-download" download>
+          <Download size={16} /> Download Mod (for Players)
+        </a>
       </section>
 
       <section className="panel" style={{ marginBottom: 18 }}>

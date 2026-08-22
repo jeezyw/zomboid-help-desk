@@ -20,8 +20,7 @@ A single container:
 Docker-based Start/Stop/Restart and live game-process CPU/RAM stats are
 **optional** (`DOCKER_CONTROL_ENABLED` in `docker-compose.yml`, off by default) -
 they work by shelling out to the `docker` CLI against `/var/run/docker.sock`, 
-which is bind-mounted into the container. That grants the WebUI container 
-host-root-equivalent access to the Docker daemon. Set`DOCKER_CONTROL_ENABLED` 
+which is bind-mounted into the container. Set`DOCKER_CONTROL_ENABLED` 
 to `"false"` and comment out the `docker.sock` mount fora fully unprivileged 
 container. Everything else (settings editors, mods,backups, RCON admin tools, 
 console tailing) works with zero Docker privilege seither way. Console, config, 
@@ -105,30 +104,22 @@ the app, not `docker-compose.yml`:
    small JSON file with everyone's position every few seconds - the webui
    reads and plots it.
 
-   **Client-side note**: copy the `ZHDPositionTracker/42/` folder your local 
-   `Zomboid/mods/` directory to satisfy the compatibility check - it has no client Lua at
-   all, so this is purely a formality.
+   **Client-side note**: each connecting player needs their own local copy of
+   the mod to satisfy the server/client check - it has no client Lua at all,
+   so this is purely a formality. Settings tab → "Download Mod (for Players)"
+   gives you a zip already rooted at `ZHDPositionTracker/` - send it to
+   players and have them extract it directly into their own `Zomboid/mods/`
+   folder.
    
 2. **Map tiles**: two independent options, both from the Live Map/Settings
    tabs, either or both can be used:
    
-   - **Base Map (Vanilla, Isometric)**: works out of the box.
+   **Base Map (Vanilla, Isometric)**: works out of the box.
    
-   - **Map Rendering**: rendered in-app from your own live server's actual
-     game/mod data, top-down mode, using
-     [pzmap2dzi](https://github.com/cff29546/pzmap2dzi). **Heavy job** that
-     can take a good while depending on world size and hardware, Needs `GAME_FILES_DATA`
-     populated first (installed via the Server tab's dedicated server panel,
-     steamcmd - the same install used for `SERVER_MODE=bundled`, or on its
-     own even if you're managing an external server). Uncomment the tiles
-     volume line in `docker-compose.yml` before rendering so the output
-     actually persists on the host.
-   - **Map Calibration**: Do not use this yet unless you can upload a new map file with
-     which to calibrate to. The file used exceeds git's file size limit.
-
-   If multiple maps are tiled, the Live Map viewer prefers the Base Map (Leaflet)
-   output. Remove the one you don't wanna use.
-
+   **Map Calibration**: Do not use this yet unless you can upload a new map file with
+   which to calibrate to. The file used exceeds git's file size limit, if you want it
+   message me and I'll send you a google drive link.
+     
 ## Bundled Server Hosting
 
 Optional (`SERVER_MODE: bundled`). Lets this app install and run its own PZ

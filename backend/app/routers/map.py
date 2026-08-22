@@ -1,4 +1,5 @@
 from fastapi import APIRouter, HTTPException
+from fastapi.responses import Response
 from pydantic import BaseModel
 
 from .. import live_map, map_calibration
@@ -49,6 +50,17 @@ async def map_setup_status():
 @router.post("/api/map/setup")
 async def map_setup():
     return live_map.setup()
+
+
+@router.get("/api/map/mod-download")
+async def download_mod():
+    if not live_map.MOD_SOURCE_DIR.is_dir():
+        raise HTTPException(404, "Mod files not found in this image.")
+    return Response(
+        content=live_map.build_mod_zip(),
+        media_type="application/zip",
+        headers={"Content-Disposition": 'attachment; filename="ZHDPositionTracker.zip"'},
+    )
 
 
 @router.get("/api/map/calibration")

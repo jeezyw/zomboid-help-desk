@@ -15,9 +15,11 @@ to check: find where ZHDPositions.json actually landed and add it here.
 
 from __future__ import annotations
 
+import io
 import json
 import shutil
 import time
+import zipfile
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
@@ -128,6 +130,24 @@ def _dest_dir() -> Path:
 
 def mod_installed() -> bool:
     return (_dest_dir() / MOD_VERSION_SUBFOLDER / "mod.info").is_file()
+
+
+def build_mod_zip() -> bytes:
+    """Zips the bundled ZHDPositionTracker mod for distribution to players.
+    Since this isn't a real Steam Workshop item, each connecting player's own
+    client needs a local copy to pass PZ's mod compatibility check (it's a
+    formality only - see README's Live Map section, the mod has no client-side
+    Lua at all). Archive paths are rooted at MOD_ID/, matching MOD_SOURCE_DIR's
+    own folder name, so extracting the zip directly into a player's local
+    Zomboid/mods/ directory reproduces the same
+    <mods_root>/ZHDPositionTracker/42/... layout the server itself uses -
+    same MOD_VERSION_SUBFOLDER nesting requirement as install_mod() below."""
+    buf = io.BytesIO()
+    with zipfile.ZipFile(buf, "w", zipfile.ZIP_DEFLATED) as zf:
+        for path in sorted(MOD_SOURCE_DIR.rglob("*")):
+            if path.is_file():
+                zf.write(path, arcname=str(Path(MOD_ID) / path.relative_to(MOD_SOURCE_DIR)))
+    return buf.getvalue()
 
 
 def _enable_mods_entry_only() -> dict:
